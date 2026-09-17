@@ -16,16 +16,27 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
   }
 });
 
+// Function wrapper to catch Multer file parsing errors gracefully
+const handleUpload = (req, res, next) => {
+  upload.single("photoUrl")(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: "File upload error: " + err.message });
+    }
+    next();
+  });
+};
+
 profileRouter.patch(
   "/profile/edit",
   userAuth,
-  upload.single("photoUrl"),
+  handleUpload, // Use safe upload middleware
   async (req, res) => {
     try {
       if (!validateEditProfileData(req)) {
         throw new Error("Invalid Edit");
       }
-      if (req.body.skills) {
+
+      if (req.body.skills && typeof req.body.skills === "string") {
         req.body.skills = JSON.parse(req.body.skills);
       }
 
@@ -35,12 +46,14 @@ profileRouter.patch(
 
       const loggedInUser = req.user;
 
-      // Update normal fields
+      // Avoid overwriting fields with undefined or file objects
       Object.keys(req.body).forEach((key) => {
-        loggedInUser[key] = req.body[key];
+        if (key !== "photoUrl") {
+          loggedInUser[key] = req.body[key];
+        }
       });
 
-      // Upload image and update photoUrl
+      // Upload image to Cloudinary if file exists
       if (req.file) {
         const imageUrl = await uploadOnCloudinary(req.file.path);
         loggedInUser.photoUrl = imageUrl;
@@ -53,9 +66,9 @@ profileRouter.patch(
         data: loggedInUser,
       });
     } catch (err) {
-      res.status(400).send("Error " + err.message);
+      res.status(400).json({ error: err.message });
     }
-  },
+  }
 );
 
 profileRouter.patch("/profile/password", userAuth, async (req, res) => {

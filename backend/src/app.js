@@ -14,13 +14,18 @@ const initializesocket=require("./utils/socket")
 
 require("dotenv").config()
 
-app.use(cors({
+const corsOptions = {
   origin: "https://devtinder-fullstack-1.onrender.com",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+};
 
+// 1. Mount CORS first
+app.use(cors(corsOptions));
+
+// 2. Respond to preflight OPTIONS requests before body-parsers and routers
+app.options("*", cors(corsOptions));
 
 const authRouter=require("./routes/auth");
 const profileRouter=require("./routes/profile")

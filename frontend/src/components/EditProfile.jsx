@@ -49,6 +49,7 @@ const EditProfile = ({ user }) => {
       const result = await axios.patch(BASE_URL + "/profile/edit", formData, {
         withCredentials: true,
       });
+      console.log(result.data);
       dispatch(addUser(result?.data?.data));
       setShowToast(true);
       setTimeout(() => {
