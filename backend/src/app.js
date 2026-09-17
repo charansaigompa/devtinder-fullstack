@@ -18,7 +18,9 @@ const corsOptions = {
   origin: "https://devtinder-fullstack-1.onrender.com",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  optionsSuccessStatus: 200,
+  preflightContinue: false,
 };
 
 // 1. Mount CORS first
