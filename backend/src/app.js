@@ -24,7 +24,9 @@ const corsOptions = {
 // 1. Mount CORS first
 app.use(cors(corsOptions));
 
+
 // 2. Respond to preflight OPTIONS requests before body-parsers and routers
+app.options(/(.*)/, cors(corsOptions));
 
 
 const authRouter=require("./routes/auth");
